@@ -18,7 +18,7 @@ public class Tank extends Sprite {
     private Weapon weapon;
     private float fuel;
     Vector2 pos;
-    public Weapon weaponShot;
+    public Weapon weaponShot = null;
 
     public Tank(World world, OrthographicCamera camera, Vector2 pos, World weapWorld, String frame) {
         this.camera = camera;
@@ -62,10 +62,6 @@ public class Tank extends Sprite {
     public void hitTank(Tank tank) {
 
     }
-
-    public void selectWeapon() {
-
-    }
     public void dispose() {
 
         texture.dispose();
@@ -73,7 +69,7 @@ public class Tank extends Sprite {
 
     public void handleInput() {
 
-//        if (weaponShot == null) {
+
             Vector2 cursor = new Vector2(Gdx.input.getX(), Gdx.input.getY());
             Vector3 coo = camera.unproject(new Vector3(cursor, 0));
             if (Gdx.input.justTouched()) {
@@ -85,7 +81,7 @@ public class Tank extends Sprite {
                 }
                 weapon.shoot(b2body, angle, dist);
                 weaponShot = weapon;
-//            }
+            }
         }
-    }
+
 }

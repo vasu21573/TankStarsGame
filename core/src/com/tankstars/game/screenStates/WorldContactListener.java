@@ -1,31 +1,28 @@
 package com.tankstars.game.screenStates;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.physics.box2d.*;
-import com.tankstars.game.Weapon;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.ContactImpulse;
+import com.badlogic.gdx.physics.box2d.ContactListener;
+import com.badlogic.gdx.physics.box2d.Manifold;
+import com.tankstars.game.Tank;
+
 
 public class WorldContactListener implements ContactListener {
 
-
-    Weapon weapon;
-    public WorldContactListener(Weapon weapon) {
-        this.weapon = weapon;
+    private Tank tank;
+    public WorldContactListener(Tank tank) {
+        this.tank = tank;
     }
 
     @Override
     public void beginContact(Contact contact) {
 
-        Fixture fixA = contact.getFixtureA();
-        Fixture fixB = contact.getFixtureB();
-
-        if (fixA.getUserData() == "Weapon" || fixB.getUserData() == "Weapon") {
-
-        }
+        tank.weaponShot.finished = true;
     }
 
     @Override
     public void endContact(Contact contact) {
-        Gdx.app.log("End Contact", "");
+
     }
 
     @Override

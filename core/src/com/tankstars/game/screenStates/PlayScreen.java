@@ -35,6 +35,7 @@ public class PlayScreen implements Screen {
     private World weapWorld;
     private World tank2World;
     private HUD hud;
+
     public PlayScreen(GameStateManager gsm) {
 
         player1Move = true;
@@ -59,7 +60,7 @@ public class PlayScreen implements Screen {
         mapObject(weapWorld);
         mapObject(tank2World);
         hud=new HUD(batch);
-        weapWorld.setContactListener(new WorldContactListener(tank.weaponShot));
+        weapWorld.setContactListener(new WorldContactListener(tank));
     }
 
     private void mapObject(World world) {
@@ -151,9 +152,6 @@ public class PlayScreen implements Screen {
     @Override
     public void render(float delta) {
         weapWorld.step(Gdx.graphics.getDeltaTime(), 6, 2);
-
-        batch.begin();
-        batch.end();
         camera.update();
         mapRenderer.setView(camera);
 
@@ -166,9 +164,15 @@ public class PlayScreen implements Screen {
         batch.begin();
         batch.draw(tank.texture, tank.b2body.getPosition().x - 10, tank.b2body.getPosition().y, 50, 40);
         batch.draw(tank2.texture, tank2.b2body.getPosition().x - 10, tank2.b2body.getPosition().y, 50, 40);
+
+
+        if (tank.weaponShot != null) {
+            if (!tank.weaponShot.finished)
+                batch.draw(tank.weaponShot.texture, tank.weaponShot.b2body.getPosition().x - 5, tank.weaponShot.b2body.getPosition().y - 5, 40, 20);
+        }
         batch.end();
         tank.handleInput();
-        tank2.handleInput();
+//        tank2.handleInput();
         handleInput1();
         handleInput2();
         batch.setProjectionMatrix(hud.stage.getCamera().combined);
