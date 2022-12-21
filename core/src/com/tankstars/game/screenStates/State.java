@@ -12,7 +12,7 @@ import java.io.IOException;
 
 public abstract class State extends ApplicationAdapter {
 
-    public static final OrthographicCamera camera = new OrthographicCamera();;
+    public OrthographicCamera camera = new OrthographicCamera();;
     protected GameStateManager gsm;
     protected Sound click;
 
