@@ -39,7 +39,6 @@ public class PlayScreen implements Screen {
     private int move = 0;
     private World weapWorld;
     private World tank2World;
-    private HUD hud;
     private boolean turn;
     private Rectangle saveRegion;
     private MoveByAction mba;
