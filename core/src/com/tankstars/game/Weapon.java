@@ -18,7 +18,7 @@ public class Weapon {
     }
 
 //private static Map<World,Weapon> instances=new HashMap<>();
-
+//
 //    public static Weapon getInstance(World world){
 //        World key=world;
 //        if(!instances.containsKey(key)){

@@ -8,11 +8,8 @@ import com.badlogic.gdx.scenes.scene2d.actions.MoveByAction;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.tankstars.game.MyActor;
-import com.tankstars.game.Tank;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 
 public class HomeState extends State{
 
@@ -57,16 +54,6 @@ public class HomeState extends State{
             }
             if (checkClick(Gdx.input.getX(), Gdx.input.getY(), exitButton.getX(), exitButton.getY(), exitButton.getWidth(), exitButton.getHeight())) {
                 Gdx.app.exit();
-            } if (checkClick(Gdx.input.getX(), Gdx.input.getY(), resumeButton.getX(), resumeButton.getY(), resumeButton.getWidth(),  resumeButton.getHeight())) {
-                click.play(0.5f);
-                FileInputStream fis = new FileInputStream("saved.txt");
-                ObjectInputStream ois = new ObjectInputStream(fis);
-                Tank tank1 = (Tank) ois.readObject();
-                Tank tank2 = (Tank) ois.readObject();
-                fis.close();
-                ois.close();
-                gsm.setCurrentState((new PlayState(gsm, tank1, tank2)));
-                gsm.set(gsm.getCurrentState());
             }
         }
     }

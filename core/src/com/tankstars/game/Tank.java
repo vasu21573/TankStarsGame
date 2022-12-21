@@ -24,6 +24,8 @@ public class Tank extends Sprite {
     private SpriteBatch batch;
     private Texture dot;
     private boolean move;
+    private double health_p;
+    private double fuel = 100;
 
     public Tank(World world, OrthographicCamera camera, Vector2 pos, World weapWorld, String frame) {
         this.camera = camera;
@@ -61,6 +63,7 @@ public class Tank extends Sprite {
 
         public Health(float health) {
             this.health = health;
+            health_p=health;
         }
 
         public void hitByWeapon(Weapon weapon, Tank tank) {
@@ -112,10 +115,6 @@ public class Tank extends Sprite {
         return b2body;
     }
 
-    public Vector2 getPos() {
-        return pos;
-    }
-
     @Override
     public Texture getTexture() {
         return texture;
@@ -158,5 +157,12 @@ public class Tank extends Sprite {
 
     public void setHealth(Health health) {
         this.health = health;
+    }
+    public void save() {
+        DummyTank obj = new DummyTank();
+        obj.x1 = b2body.getPosition().x;
+        obj.y1 = b2body.getPosition().y;
+        obj.P1_health = health_p;
+        obj.P1_fuel=fuel;
     }
 }

@@ -15,6 +15,8 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.tankstars.game.MyActor;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
 public class SelectState extends State{
 
@@ -113,12 +115,34 @@ public class SelectState extends State{
         batch.draw(arrow, 570, 250, 100, 100);
         arrowRegion.setPosition(570, 250);
         arrowRegion.setSize(100, 100);
-        if (turn == 0) {
-            batch.draw(tank1, 0, 100, 500, 370);
-        } else if (turn == 1) {
-            batch.draw(tank2, 30, 20, 500, 570);
-        } else if (turn == 2) {
-            batch.draw(tank3, 20, 140, 500, 270);
+//        if (turn == 0) {
+//            batch.draw(tank1, 0, 100, 500, 370);
+//        } else if (turn == 1) {
+//            batch.draw(tank2, 30, 20, 500, 570);
+//        } else if (turn == 2) {
+//            batch.draw(tank3, 20, 140, 500, 270);
+//        }
+        Collection c=new ArrayList();
+        for(int i=0; i<3; i++){
+            c.add(tankList.get(i));
+        }
+        Iterator iter=c.iterator();
+
+        int i=turn;
+        while(i!=-1){
+            if(i==0){
+                if (turn == 0) {
+                    batch.draw(tank1, 0, 100, 500, 370);
+                } else if (turn == 1) {
+                    batch.draw(tank2, 30, 120, 500, 370);
+                } else if (turn == 2) {
+                    batch.draw(tank3, 20, 140, 500, 270);
+                }
+                i--;
+            }
+            else{
+                i--;
+            }
         }
         stage.draw();
         handleInput();

@@ -327,7 +327,7 @@ public class PlayScreen implements Screen {
                 backPauseScreen(mba, sound);
 
             } else if (set && Gdx.input.getX() > 40 && Gdx.input.getX() < 260 && 600 - Gdx.input.getY() > 170 && 600 - Gdx.input.getY() < 240) {
-
+                // nothing to show
             }
         }
     }
