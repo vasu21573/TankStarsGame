@@ -19,7 +19,6 @@ public class Tank extends Sprite {
     private Body b2body;
     private Health health = new Health(100);
     private Weapon weapon;
-    private float fuel;
     private Vector2 pos;
     private World weapworld;
     private SpriteBatch batch;
@@ -64,8 +63,21 @@ public class Tank extends Sprite {
             this.health = health;
         }
 
-        public void hitByWeapon(Weapon weapon, Vector2 position, Tank tank) {
+        public void hitByWeapon(Weapon weapon, Tank tank) {
+            System.out.println(Math.abs(tank.b2body.getPosition().x - weapon.getDropped().x));
+            if (Math.abs(tank.b2body.getPosition().x - weapon.getDropped().x) <= 100 && Math.abs(tank.b2body.getPosition().y - weapon.getDropped().y) <= 100) {
+                if (Math.abs(tank.b2body.getPosition().x - weapon.getDropped().x) <= 2 && Math.abs(tank.b2body.getPosition().y - weapon.getDropped().y) <= 2) {
+                 tank.health.health = 0;
+                } else {
+                    tank.health.health = tank.health.health - 20;
+                }
+            } if (tank.health.health <= 0) {
+                System.out.println("GAME OVER");
+            }
+        }
 
+        public float getHealth() {
+            return health;
         }
     }
 

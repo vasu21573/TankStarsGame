@@ -1,6 +1,7 @@
 package com.tankstars.game.screenStates;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.tankstars.game.TankStars;
 
@@ -10,6 +11,7 @@ import java.util.Stack;
 public class GameStateManager {
 
     public TankStars game;
+    public OrthographicCamera camera;
     private Stack<State> states;
     private State currentState;
 

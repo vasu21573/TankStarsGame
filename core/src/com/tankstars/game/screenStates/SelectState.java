@@ -19,7 +19,7 @@ import java.util.ArrayList;
 public class SelectState extends State{
 
     private Texture bg;
-    private Sprite tank3 = new Sprite(new Texture("Dubstep.png"));
+    private Sprite tank3 = new Sprite(new Texture("Frame 1.png"));
     private Sprite tank2 = new Sprite(new Texture("Helios.png"));
     private Sprite tank1 = new Sprite(new Texture("Toxic.png"));
     private Stage stage;

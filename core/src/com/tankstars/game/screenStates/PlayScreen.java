@@ -5,16 +5,21 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.PolylineMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.MoveByAction;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.tankstars.game.MyActor;
 import com.tankstars.game.Tank;
 
 public class PlayScreen implements Screen {
@@ -36,15 +41,38 @@ public class PlayScreen implements Screen {
     private World tank2World;
     private HUD hud;
     private boolean turn;
+    private Rectangle saveRegion;
+    private MoveByAction mba;
+    private MyActor bg;
+    private MyActor resume;
+    private MyActor save;
+    private MyActor exit;
+    private MyActor sound;
+    private Stage stage;
+    private boolean set;
+    private GameStateManager gsm;
+    private Texture pause;
+    private Texture gameOver;
+    private Texture Exit;
+    private Texture h1;
+    private Texture h2;
 
     public PlayScreen(GameStateManager gsm) {
+        this.gsm = gsm;
+        this.camera = gsm.camera;
+        saveRegion = new Rectangle(0, 510, 90, 70);
+        pause = new Texture("pause.png");
+        gameOver = new Texture("Game_Over_logo.png");
+        Exit = new Texture("exit.png");
+        h1 = new Texture("Rectangle 1.png");
+        h2 = new Texture("Rectangle 2.png");
 
+        viewport = new ScreenViewport(camera);
+        stage = new Stage(viewport);
         player1Move = true;
         player2move = false;
         turn = true;
 
-        camera = new OrthographicCamera();
-        viewport = new FitViewport(1200, 600, camera);
         batch = new SpriteBatch();
 
         mapLoader = new TmxMapLoader();
@@ -64,9 +92,25 @@ public class PlayScreen implements Screen {
         mapObject(world);
         mapObject(weapWorld);
         mapObject(tank2World);
-        hud=new HUD(batch);
+//        hud=new HUD(batch);
+        bg = new MyActor(-500, 0, 300, 600, "yellow.png");
+        resume = new MyActor(-460, 400, 220, 70, "resume.png");
+        save = new MyActor(-460, 170, 220, 200, "save.png");
+        exit = new MyActor(-460, 70, 220, 70, "exit.png");
+        sound = new MyActor(-280, 0, 50, 50, "sound.png");
+        set = false;
+        addMyActor(stage, bg);
+        addMyActor(stage, resume);
+        addMyActor(stage, exit);
+        addMyActor(stage, save);
+        addMyActor(stage, sound);
+
+        Gdx.input.setInputProcessor(stage);
     }
 
+    public void addMyActor(Stage stage, MyActor actor) { // new
+        stage.addActor(actor);
+    }
     private void mapObject(World world) {
         for (MapObject object : map.getLayers().get(1).getObjects()) {
             Shape shape;
@@ -105,7 +149,7 @@ public class PlayScreen implements Screen {
 
     private void handleInput1() {
         if (Gdx.input.isKeyPressed(Input.Keys.ANY_KEY)) {
-            if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) && move < 7000) {
+            if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) && move < 5000) {
                 world.step(Gdx.graphics.getDeltaTime(), 6, 2);
                 tank.getB2body().applyLinearImpulse(new Vector2(1f, 0), tank.getB2body().getWorldCenter(), true);
                 if (tank.getB2body().getLinearVelocity().x >= 20f) {
@@ -113,7 +157,7 @@ public class PlayScreen implements Screen {
                     tank.getB2body().setLinearVelocity(20, tank.getB2body().getLinearVelocity().y);
                 }
                 move += 10;
-            } else if (Gdx.input.isKeyPressed(Input.Keys.LEFT) && move < 7000) {
+            } else if (Gdx.input.isKeyPressed(Input.Keys.LEFT) && move < 5000) {
                 world.step(Gdx.graphics.getDeltaTime(), 6, 2);
                 tank.getB2body().applyLinearImpulse(new Vector2(-1f, 0), tank.getB2body().getWorldCenter(), true);
                 if (tank.getB2body().getLinearVelocity().x <= -20f) {
@@ -122,7 +166,7 @@ public class PlayScreen implements Screen {
                 }
                 move += 10;
 
-            } else if (move >= 7000) {
+            } else if (move >= 5000) {
                 tank.setMove(false);
                 move = 0;
             }
@@ -130,6 +174,8 @@ public class PlayScreen implements Screen {
             if (tank.getWeapon().isFinished()) {
                 move = 0;
                 turn = false;
+                tank2.getHealth().hitByWeapon(tank.getWeapon(), tank2);
+                tank2.getHealth().hitByWeapon(tank.getWeapon(), tank);
                 tank.setWeapon(null);
             }
         }
@@ -138,20 +184,21 @@ public class PlayScreen implements Screen {
     private void handleInput2() {
         if (Gdx.input.isKeyPressed(Input.Keys.ANY_KEY)) {
             tank2World.step(Gdx.graphics.getDeltaTime(), 6, 2);
-            if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) && move < 7000) {
+            if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) && move < 5000) {
                 tank2.getB2body().applyLinearImpulse(new Vector2(1f, 0), tank2.getB2body().getWorldCenter(), true);
                 if (tank2.getB2body().getLinearVelocity().x >= 20f) {
                     tank2.getB2body().setLinearVelocity(20, tank2.getB2body().getLinearVelocity().y);
                 }
                 move += 10;
-            } else if (Gdx.input.isKeyPressed(Input.Keys.LEFT) && move < 7000) {
+            } else if (Gdx.input.isKeyPressed(Input.Keys.LEFT) && move < 5000) {
                 tank2.getB2body().applyLinearImpulse(new Vector2(-1f, 0), tank2.getB2body().getWorldCenter(), true);
                 if (tank2.getB2body().getLinearVelocity().x <= -20f) {
                     tank2.getB2body().setLinearVelocity(-20f, tank2.getB2body().getLinearVelocity().y);
                 }
                 move += 10;
 
-            } else if (move >= 7000) {
+
+            } else if (move >= 5000) {
                 tank2.setMove(false);
                 move = 0;
             }
@@ -159,6 +206,8 @@ public class PlayScreen implements Screen {
             if (tank2.getWeapon().isFinished()) {
                 move = 0;
                 turn = true;
+                tank.getHealth().hitByWeapon(tank2.getWeapon(), tank);
+                tank.getHealth().hitByWeapon(tank2.getWeapon(), tank2);
                 tank2.setWeapon(null);
             }
         }
@@ -187,14 +236,28 @@ public class PlayScreen implements Screen {
             handleInput2();
             tank2.operation();
         }
-        batch.setProjectionMatrix(hud.stage.getCamera().combined);
+        bringPause();
+        batch.draw(pause, 0, 510, 90, 70);
+        checkHealth();
+        showHealth();
         batch.end();
-        hud.stage.draw();
+        stage.act(Gdx.graphics.getDeltaTime());
+        stage.draw();
     }
 
     private void drawTank(Tank tank, float y) {
 
         batch.draw(tank.getTexture(), tank.getB2body().getPosition().x - 10, tank.getB2body().getPosition().y - y, 50, 40);
+    }
+    public void checkHealth() {
+        if (tank.getHealth().getHealth() <= 0 || tank2.getHealth().getHealth() <= 0) {
+            batch.draw(gameOver, 200, 150);
+            batch.draw(Exit, 400, 70, 220, 70);
+            if (Gdx.input.isKeyPressed(Input.Keys.E)) {
+                gsm.setCurrentState(new HomeState(gsm));
+                gsm.push(gsm.getCurrentState());
+            }
+        }
     }
 
     private void b2drRender() {
@@ -239,4 +302,52 @@ public class PlayScreen implements Screen {
         b2dr.dispose();
         tank.dispose();
     }
+
+    public void bringPause() {
+        if (Gdx.input.justTouched()) {
+            Vector2 touch = viewport.unproject(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
+            if (saveRegion.contains(touch)) {
+
+                movePauseScreen(mba, bg);
+                movePauseScreen(mba, resume);
+                movePauseScreen(mba, exit);
+                movePauseScreen(mba, save);
+                movePauseScreen(mba, sound);
+                set = true;
+
+            } else if (set && Gdx.input.getX() > 40 && Gdx.input.getX() < 260 && 600 - Gdx.input.getY() > 70 && 600 - Gdx.input.getY() < 70 + 70) {
+                gsm.setCurrentState(new HomeState(gsm));
+                gsm.push(gsm.getCurrentState());
+            } else if (set && Gdx.input.getY() > 40 && Gdx.input.getX() < 260 && 600 - Gdx.input.getY() > 400 && 600 - Gdx.input.getY() < 530) {
+                set = false;
+
+                backPauseScreen(mba, bg);
+                backPauseScreen(mba, resume);
+                backPauseScreen(mba, exit);
+                backPauseScreen(mba, save);
+                backPauseScreen(mba, sound);
+
+            } else if (set && Gdx.input.getX() > 40 && Gdx.input.getX() < 260 && 600 - Gdx.input.getY() > 170 && 600 - Gdx.input.getY() < 240) {
+
+            }
+        }
+    }
+    public void movePauseScreen(MoveByAction mba, MyActor actor) {
+        mba = new MoveByAction();
+        mba.setAmount(500f, 0f);
+        mba.setDuration(0.5f);
+        actor.addAction(mba);
+    }
+    public void backPauseScreen(MoveByAction mba, MyActor actor) {
+        mba = new MoveByAction();
+        mba.setAmount(-500f, 0f);
+        mba.setDuration(0.5f);
+        actor.addAction(mba);
+    }
+
+    public void showHealth() {
+        batch.draw(h1, 100, 500, 300 * tank.getHealth().getHealth() / 100, 10);
+        batch.draw(h2, 800, 500, 300 * tank2.getHealth().getHealth() / 100, 10);
+    }
 }
+
