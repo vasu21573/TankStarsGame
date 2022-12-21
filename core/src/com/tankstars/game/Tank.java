@@ -106,7 +106,8 @@ public class Tank extends Sprite {
                 }
                 weapon = new Weapon(weapworld);
 //                weapon = Weapon.getInstance(weapworld);
-                weapon.getWorld().setContactListener(new WorldContactListener(weapon));
+//                weapon.getWorld().setContactListener(new WorldContactListener(weapon));
+                weapon.getWorld().setContactListener(WorldContactListener.getInstance(weapon));
                 weapon.shoot(b2body, angle, dist);
             }
         }
