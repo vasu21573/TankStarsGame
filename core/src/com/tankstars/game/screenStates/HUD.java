@@ -18,12 +18,12 @@ public class HUD {
     private float timeCount;
     private Integer health1;
     private Integer health2;
-    Label countdownLabel;
-    Label health1Label;
-    Label health2Label;
-    Label timeLabel;
-    Label p1Label;
-    Label p2Label;
+    private Label countdownLabel;
+    private Label health1Label;
+    private Label health2Label;
+    private Label timeLabel;
+    private Label p1Label;
+    private Label p2Label;
 
     public HUD(SpriteBatch sb) {
         worldTimer = 30;

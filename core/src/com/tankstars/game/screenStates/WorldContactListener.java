@@ -16,9 +16,9 @@ public class WorldContactListener implements ContactListener {
     public void beginContact(Contact contact) {
 
         weapon.setFinished(true);
+        weapon.setDropped(new Vector2(weapon.getB2body().getPosition().x, weapon.getB2body().getPosition().y));
         weapon.getB2body().setGravityScale(0);
         weapon.getB2body().applyLinearImpulse(new Vector2(0, 1000f), weapon.getB2body().getWorldCenter(), false);
-//        weapon.getDropped().
     }
 
     @Override

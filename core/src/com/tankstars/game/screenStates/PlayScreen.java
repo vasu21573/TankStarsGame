@@ -35,11 +35,14 @@ public class PlayScreen implements Screen {
     private World weapWorld;
     private World tank2World;
     private HUD hud;
+    private boolean turn;
 
     public PlayScreen(GameStateManager gsm) {
 
         player1Move = true;
         player2move = false;
+        turn = true;
+
         camera = new OrthographicCamera();
         viewport = new FitViewport(1200, 600, camera);
         batch = new SpriteBatch();
@@ -54,7 +57,9 @@ public class PlayScreen implements Screen {
         tank2World = new World(new Vector2(0, -20f), true);
         b2dr = new Box2DDebugRenderer();
         tank = new Tank(world, camera, new Vector2(50, 235), weapWorld, "Frame 1.png");
-        tank2 = new Tank(tank2World, camera, new Vector2(1000, 250), weapWorld, "Frame 2.png");
+        tank.setMove(true);
+        tank2 = new Tank(tank2World, camera, new Vector2(1000, 235), weapWorld, "Frame 2.png");
+        tank2.setMove(false);
 
         mapObject(world);
         mapObject(weapWorld);
@@ -99,32 +104,39 @@ public class PlayScreen implements Screen {
     }
 
     private void handleInput1() {
-        if (Gdx.input.isKeyPressed(Input.Keys.ANY_KEY) && player1Move) {
-            world.step(Gdx.graphics.getDeltaTime(), 6, 2);
-            if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) &&  move < 7000) {
+        if (Gdx.input.isKeyPressed(Input.Keys.ANY_KEY)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) && move < 7000) {
+                world.step(Gdx.graphics.getDeltaTime(), 6, 2);
                 tank.getB2body().applyLinearImpulse(new Vector2(1f, 0), tank.getB2body().getWorldCenter(), true);
                 if (tank.getB2body().getLinearVelocity().x >= 20f) {
+                    world.step(Gdx.graphics.getDeltaTime(), 6, 2);
                     tank.getB2body().setLinearVelocity(20, tank.getB2body().getLinearVelocity().y);
                 }
                 move += 10;
-            }
-            else if (Gdx.input.isKeyPressed(Input.Keys.LEFT) &&  move < 7000) {
+            } else if (Gdx.input.isKeyPressed(Input.Keys.LEFT) && move < 7000) {
+                world.step(Gdx.graphics.getDeltaTime(), 6, 2);
                 tank.getB2body().applyLinearImpulse(new Vector2(-1f, 0), tank.getB2body().getWorldCenter(), true);
                 if (tank.getB2body().getLinearVelocity().x <= -20f) {
+                    world.step(Gdx.graphics.getDeltaTime(), 6, 2);
                     tank.getB2body().setLinearVelocity(-20f, tank.getB2body().getLinearVelocity().y);
                 }
                 move += 10;
 
             } else if (move >= 7000) {
-                player1Move = false;
-                player2move = true;
+                tank.setMove(false);
                 move = 0;
+            }
+        } if (tank.getWeapon() != null) {
+            if (tank.getWeapon().isFinished()) {
+                move = 0;
+                turn = false;
+                tank.setWeapon(null);
             }
         }
     }
 
     private void handleInput2() {
-        if (Gdx.input.isKeyPressed(Input.Keys.ANY_KEY) && player2move) {
+        if (Gdx.input.isKeyPressed(Input.Keys.ANY_KEY)) {
             tank2World.step(Gdx.graphics.getDeltaTime(), 6, 2);
             if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) && move < 7000) {
                 tank2.getB2body().applyLinearImpulse(new Vector2(1f, 0), tank2.getB2body().getWorldCenter(), true);
@@ -140,13 +152,17 @@ public class PlayScreen implements Screen {
                 move += 10;
 
             } else if (move >= 7000) {
-                player2move = false;
-                player1Move = true;
+                tank2.setMove(false);
                 move = 0;
+            }
+        } if (tank2.getWeapon() != null) {
+            if (tank2.getWeapon().isFinished()) {
+                move = 0;
+                turn = true;
+                tank2.setWeapon(null);
             }
         }
     }
-
     @Override
     public void render(float delta) {
         weapWorld.step(Gdx.graphics.getDeltaTime(), 6, 2);
@@ -159,11 +175,18 @@ public class PlayScreen implements Screen {
         b2drRender();
         batch.begin();
         drawTank(tank, 0);
-        drawTank(tank2, 20);
-        checkSprite(tank);
-        tank.handleInput();
-        handleInput1();
-        tank.operation();
+        drawTank(tank2, 5);
+        if (turn) {
+            checkSprite(tank);
+            tank.handleInput();
+            handleInput1();
+            tank.operation();
+        } else {
+            checkSprite(tank2);
+            tank2.handleInput();
+            handleInput2();
+            tank2.operation();
+        }
         batch.setProjectionMatrix(hud.stage.getCamera().combined);
         batch.end();
         hud.stage.draw();

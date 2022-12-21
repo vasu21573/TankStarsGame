@@ -4,9 +4,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class Weapon {
     private final World world;
     private Body b2body;
@@ -14,31 +11,31 @@ public class Weapon {
     private boolean finished  = false;
     private Vector2 dropped;
 
-//
-//    public Weapon(World world) {
-//        this.world = world;
-//
-//    }
-private static Map<World,Weapon> instances=new HashMap<>();
 
-    public static Weapon getInstance(World world){
-        World key=world;
-        if(!instances.containsKey(key)){
-            instances.put(key, new Weapon(world));
-        }
-        return instances.get(key);
-    }
-
-    private Weapon(World world) {
-
+    public Weapon(World world) {
         this.world = world;
+
     }
+
+//private static Map<World,Weapon> instances=new HashMap<>();
+
+//    public static Weapon getInstance(World world){
+//        World key=world;
+//        if(!instances.containsKey(key)){
+//            instances.put(key, new Weapon(world));
+//        }
+//        return instances.get(key);
+//    }
+//
+//    private Weapon(World world) {
+//
+//        this.world = world;
+//    }
 
     public void shoot(Body body, double angle, double dist) {
         texture  = new Texture("missile.png");
         createWeapon(body);
         b2body.applyLinearImpulse(new Vector2((float) (dist / 2 * Math.cos(angle)), (float) (dist / 2 * Math.sin(angle))) , b2body.getWorldCenter(), true);
-        finished = false;
         dropped = new Vector2();
     }
 

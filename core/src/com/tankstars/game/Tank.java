@@ -1,6 +1,7 @@
 package com.tankstars.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -16,13 +17,14 @@ public class Tank extends Sprite {
     private OrthographicCamera camera;
     private Texture texture;
     private Body b2body;
-    private Health health = new Health(100, 50);
+    private Health health = new Health(100);
     private Weapon weapon;
     private float fuel;
     private Vector2 pos;
     private World weapworld;
     private SpriteBatch batch;
     private Texture dot;
+    private boolean move;
 
     public Tank(World world, OrthographicCamera camera, Vector2 pos, World weapWorld, String frame) {
         this.camera = camera;
@@ -54,14 +56,12 @@ public class Tank extends Sprite {
         b2body.createFixture(fixtureDef);
     }
 
-    private class Health {
+    public class Health {
 
         private float health;
-        private float shield;
 
-        public Health(float health, float shield) {
+        public Health(float health) {
             this.health = health;
-            this.shield = shield;
         }
 
         public void hitByWeapon(Weapon weapon, Vector2 position, Tank tank) {
@@ -82,15 +82,15 @@ public class Tank extends Sprite {
 
             Vector2 cursor = new Vector2(Gdx.input.getX(), Gdx.input.getY());
             Vector3 coo = camera.unproject(new Vector3(cursor, 0));
-            if (Gdx.input.justTouched()) {
+            if (Gdx.input.isKeyJustPressed(Input.Keys.S)) {
                 Vector2 tankPos = new Vector2(b2body.getPosition().x, b2body.getPosition().y);
                 double dist = tankPos.dst(new Vector2(coo.x, coo.y));
                 double angle = Math.atan2((600 - (coo.y - tankPos.y)), (coo.x - tankPos.x));
                 if (coo.y < tankPos.y) {
                     angle = -1 * angle;
                 }
-//                weapon = new Weapon(weapworld);
-                weapon = Weapon.getInstance(weapworld);
+                weapon = new Weapon(weapworld);
+//                weapon = Weapon.getInstance(weapworld);
                 weapon.getWorld().setContactListener(new WorldContactListener(weapon));
                 weapon.shoot(b2body, angle, dist);
             }
@@ -126,5 +126,25 @@ public class Tank extends Sprite {
             batch.draw(dot, (float)i, (float)(yd+y0), 5, 5);
             batch.end();
         }
+    }
+
+    public boolean isMove() {
+        return move;
+    }
+
+    public void setMove(boolean move) {
+        this.move = move;
+    }
+
+    public void setWeapon(Weapon weapon) {
+        this.weapon = weapon;
+    }
+
+    public Health getHealth() {
+        return health;
+    }
+
+    public void setHealth(Health health) {
+        this.health = health;
     }
 }
